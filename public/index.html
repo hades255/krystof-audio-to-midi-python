@@ -8,24 +8,49 @@
     <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./assets/css/bootstrap-grid.min.css" />
     <link rel="stylesheet" href="./assets/css/bootstrap-reboot.min.css" />
+    <link rel="shortcut icon" href="./assets/img/pngegg.png" type="image/x-icon">
   </head>
   <body>
-    <h1>Audio to MIDI Conversion</h1>
-    <form
-      action="http://127.0.0.1:5000/upload"
-      method="POST"
-      enctype="multipart/form-data"
-      onsubmit="handleUpload(event)"
-    >
-      <input type="file" name="file" id="file-input" accept="audio" />
-      <input type="submit" value="Upload" />
-    </form>
-    <span id="uploadedFile"></span>
-    <button onclick="convert()">Convert to MIDI</button>
-    <span id="downloadFile" class=""></span>
-    <button onclick="downloadMidi()" class="">Download MIDI</button>
-    <button onclick="separate()">Separate Stems</button>
-    <div id="stems"></div>
+    <div class="container mt-5">
+      <h1 class="text-primary">Audio to MIDI Conversion</h1>
+      <form
+        action="http://127.0.0.1:5000/upload"
+        method="POST"
+        enctype="multipart/form-data"
+        onsubmit="handleUpload(event)"
+        class="mt-3 mb-3"
+      >
+        <input
+          type="file"
+          name="file"
+          id="file-input"
+          accept="audio"
+          class="form-control"
+          required
+        />
+        <input type="submit" value="Upload" class="btn btn-primary mt-2 mb-2" />
+      </form>
+      <span id="uploadedFile" class="d-none"></span>
+      <button
+        onclick="convert()"
+        disabled
+        class="btn btn-danger"
+        id="convertbtn"
+      >
+        Convert to MIDI
+      </button>
+      <span id="downloadFile" class="d-none"></span>
+      <button
+        onclick="downloadMidi()"
+        disabled
+        class="btn btn-success"
+        id="downloadbtn"
+      >
+        Download MIDI
+      </button>
+      <!-- <button onclick="separate()">Separate Stems</button> -->
+      <div id="stems"></div>
+    </div>
 
     <script src="./assets/jquery-3.7.1.min.js"></script>
     <script src="./assets/js/bootstrap.min.js"></script>
@@ -46,6 +71,7 @@
           .then((response) => {
             document.getElementById("uploadedFile").innerText =
               response.filename;
+            document.getElementById("convertbtn").disabled = false;
           })
           .catch((error) => {
             console.error("Error uploading file:", error);
@@ -65,8 +91,8 @@
         )
           .then((res) => res.json())
           .then((res) => {
-            console.log(res);
             document.getElementById("downloadFile").innerHTML = res.filename;
+            document.getElementById("downloadbtn").disabled = false;
           })
           .catch((err) => {
             console.log(err);
@@ -96,7 +122,7 @@
           document.getElementById("downloadFile").innerText === undefined
         )
           return;
-          
+
         const a = document.createElement("a");
         a.href =
           "http://127.0.0.1:5000/download/" +

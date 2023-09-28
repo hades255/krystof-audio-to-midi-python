@@ -44,7 +44,7 @@ def upload_file():
 
 @app.route('/convert/<path:filename>', methods=['GET'])
 def convert(filename):
-    midi_filename = f"{os.path.splitext(filename)[0]}.midi"
+    midi_filename = f"{os.path.splitext(filename)[0]}.mid"
     MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], filename), output=os.path.join(app.config['DOWNLOAD_FOLDER'], midi_filename), bpm=120))
     return {"msg":"OK","filename":midi_filename}
 

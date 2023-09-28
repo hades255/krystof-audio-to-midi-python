@@ -1,16 +1,26 @@
-# audio-to-midi
 
-`audio-to-midi` takes in a sound file and converts it to a multichannel MIDI file. It accomplishes this by performing FFT's on all channels of the audio data at user specified time steps. It then separates the resulting frequency analysis into equivalence classes which correspond to the twelve tone scale; the volume of each class being the average volume of its constituent frequencies. It then formats this data for MIDI and writes it out to a user specified file. It has the ability to convert whichever audio file formats are supported by the [soundfile](https://pypi.org/project/SoundFile/) module. libsndfile must be installed before running `audio-to-midi`
+<p align="center">
+  <img alt="" src="./public/assets/img/maxresdefault (2).png" width="400px" />
+</p>
 
-- [This is an example of a conversion using a time window of 5ms and an activation level of 0.](https://soundcloud.com/neil-jones/this-is-a-test)
+# <img alt="" src="./public/assets/img/pngegg.png" width="25px" /> audio-to-midi
+<img alt="" src="./public/assets/img/logo.2506b88a52d750fce903.png" width="100px" />`audio-to-midi` takes in a sound file and converts it to a multichannel MIDI file. It accomplishes this by performing FFT's on all channels of the audio data at user specified time steps. It then separates the resulting frequency analysis into equivalence classes which correspond to the twelve tone scale; the volume of each class being the average volume of its constituent frequencies. It then formats this data for MIDI and writes it out to a user specified file. It has the ability to convert whichever audio file formats are supported by the [soundfile](https://pypi.org/project/SoundFile/) module. libsndfile must be installed before running `audio-to-midi`
 
-## Installation
 
+## <img alt="" src="./public/assets/img/pngegg.png" width="25px" /> Installation
+
+- backend
 ```
-> python3 ./setup.py install
+> python ./setup.py install
+> python main.py
+```
+- frontend
+```
+> npm install
+> npx http-server
 ```
 
-## Usage
+## <img alt="" src="./public/assets/img/pngegg.png" width="25px" /> Usage
 
 ```shell
 > audio-to-midi --help
@@ -42,19 +52,5 @@ optional arguments:
   --no-progress, -n     Don't print the progress bar.
 ```
 
-## Example
-
-```shell
->$ audio-to-midi ./this_is_a_test.wav -b 120 -t 30
-./this_is_a_test.wav
-samplerate: 44100 Hz
-channels: 1
-duration: 2.000 s
-format: WAV (Microsoft) [WAV]
-subtype: Signed 16 bit PCM [PCM_16]
-window: 5.0 ms
-frequencies: min = 200.0 Hz, max = 20000 Hz
-100% (401 of 401) |##############################################################| Elapsed Time: 0:00:00 Time:  0:00:00
-> ls ./*.mid
-./this_is_a_test.wav.mid
-```
+  <img alt="" src="./public/assets/img/pngegg (4).png"/>
+  <img alt="" src="./public/assets/img/maxresdefault.jpg"/>
