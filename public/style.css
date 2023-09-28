@@ -1,0 +1,19 @@
+body {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 30px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+#uploadedFile, #downloadFile {
+    margin-bottom: 10px;
+}
+
+#downloadButton {
+    margin-top: 20px;
+}
