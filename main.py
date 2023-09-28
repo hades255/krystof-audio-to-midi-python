@@ -2,10 +2,11 @@ import os
 from flask import Flask, request, send_file
 from werkzeug.utils import secure_filename
 from pydub import AudioSegment
-from audio_to_midi import audio_to_midi
+from audio_to_midi.main import MIDIConverter, parse_params
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['DOWNLOAD_FOLDER'] = 'midi'
 app.config['ALLOWED_EXTENSIONS'] = {'wav'}
 
 def allowed_file(filename):
@@ -15,6 +16,7 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
+        # MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], "Untitled.wav"), output="Untitled.mid", bpm=120))
         # check if the post request has the file part
         if 'file' not in request.files:
             return 'No file part'
@@ -35,8 +37,9 @@ def upload_file():
                 audio.export(os.path.join(app.config['UPLOAD_FOLDER'], wav_filename), format='wav')
             # Convert WAV file to MIDI
             midi_filename = f"{os.path.splitext(wav_filename)[0]}.midi"
-            audio_to_midi(os.path.join(app.config['UPLOAD_FOLDER'], wav_filename), os.path.join(app.config['UPLOAD_FOLDER'], midi_filename))
+            MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], wav_filename), output=os.path.join(app.config['DOWNLOAD_FOLDER'], midi_filename), bpm=120))
             return midi_filename
+        return "OK"
     return '''
     <!doctype html>
     <title>Upload WAV File</title>
@@ -49,7 +52,7 @@ def upload_file():
 
 @app.route('/download/<path:filename>', methods=['GET'])
 def download(filename):
-    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+    return send_file(os.path.join(app.config['DOWNLOAD_FOLDER'], filename), as_attachment=True)
 
 if __name__ == '__main__':
     app.run()

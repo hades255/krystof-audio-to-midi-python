@@ -1,3 +1,6 @@
 audio_to_midi.egg-info
-untitled.wav
-untitled.wav.mid
+audio_to_midi/__pycache__
+uploads
+midi
+node_modules
+package-lock.json

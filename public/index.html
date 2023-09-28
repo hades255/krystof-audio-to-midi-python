@@ -1,18 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Audio to MIDI Converter</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MP3 to MIDI Conversion</title>
+
+  <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./assets/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="./assets/css/bootstrap-reboot.min.css">
+
 </head>
 <body>
-    <h1>Audio to MIDI Converter</h1>
-    <form id="uploadForm">
-        <input type="file" id="fileInput" accept=".wav">
-        <input type="submit" value="Upload">
-    </form>
-    <div id="uploadedFile"></div>
-    <div id="downloadFile"></div>
-    <button id="downloadButton" disabled>Download</button>
-    <script src="script.js"></script>
+  <h1>MP3 to MIDI Conversion</h1>
+  <form
+    action="/upload"
+    method="POST"
+    enctype="multipart/form-data"
+    onsubmit="handleUpload(event)"
+  >
+    <input type="file" name="file" id="file-input" accept=".mp3" />
+    <input type="submit" value="Upload" />
+  </form>
+  <br />
+  <span id="uploadedFile"></span>
+  <button onclick="convert()">Convert to MIDI</button>
+  <br />
+  <br />
+  <a id="downloadLink" style="display: none"></a>
+  <button onclick="downloadMidi()" style="display: none">
+    Download MIDI
+  </button>
+  <br />
+  <br />
+  <button onclick="separate()">Separate Stems</button>
+  <br />
+  <br />
+  <div id="stems"></div>
+
+  <script src="./assets/jquery-3.7.1.min.js"></script>
+  <script src="./assets/js/bootstrap.min.js"></script>
+  <script src="./assets/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function handleUpload(event) {
+      event.preventDefault();
+      const fileInput = document.getElementById("file-input");
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch("/upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          console.log("File uploaded successfully");
+          document.getElementById("uploadedFile").innerText = response.file;
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
+    }
+
+    async function convert() {
+      if(document.getElementById("uploadedFile").innerText === "")
+        return;
+      
+      const response = await fetch("/convert?file=" + document.getElementById("uploadedFile").innerText);
+      if (response.ok) {
+        const downloadLink = document.getElementById("downloadLink");
+        downloadLink.href = response.url;
+        downloadLink.download = "output.mid";
+        downloadLink.style.display = "block";
+        const downloadButton = document.querySelector(
+          'button[onclick="downloadMidi()"]'
+        );
+        downloadButton.style.display = "block";
+      } else {
+        alert("Conversion failed");
+      }
+    }
+
+    async function separate() {
+      const response = await fetch("/separate");
+      if (response.ok) {
+        const stems = await response.json();
+        const stemsDiv = document.getElementById("stems");
+        stemsDiv.innerHTML = "";
+        stems.forEach((stem) => {
+          const stemButton = document.createElement("button");
+          stemButton.textContent = `Download ${stem}`;
+          stemButton.onclick = () => downloadStem(stem);
+          stemsDiv.appendChild(stemButton);
+        });
+      } else {
+        alert("Stem separation failed");
+      }
+    }
+
+    function downloadMidi() {
+      const downloadLink = document.getElementById("downloadLink");
+      downloadLink.click();
+    }
+
+    function downloadStem(stem) {
+      window.location.href = `/stems/${stem}`;
+    }
+  
+  </script>
+</body>
 </body>
 </html>
