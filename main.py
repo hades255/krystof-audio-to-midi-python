@@ -1,10 +1,12 @@
 import os
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, make_response
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from pydub import AudioSegment
 from audio_to_midi.main import MIDIConverter, parse_params
 
 app = Flask(__name__)
+CORS(app)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['DOWNLOAD_FOLDER'] = 'midi'
 app.config['ALLOWED_EXTENSIONS'] = {'wav'}
@@ -13,7 +15,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], "Untitled.wav"), output="Untitled.mid", bpm=120))
@@ -36,19 +38,15 @@ def upload_file():
                 audio = AudioSegment.from_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 audio.export(os.path.join(app.config['UPLOAD_FOLDER'], wav_filename), format='wav')
             # Convert WAV file to MIDI
-            midi_filename = f"{os.path.splitext(wav_filename)[0]}.midi"
-            MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], wav_filename), output=os.path.join(app.config['DOWNLOAD_FOLDER'], midi_filename), bpm=120))
-            return midi_filename
-        return "OK"
-    return '''
-    <!doctype html>
-    <title>Upload WAV File</title>
-    <h1>Upload WAV File</h1>
-    <form method="post" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Upload">
-    </form>
-    '''
+            return {"msg":"OK","filename":wav_filename}
+        return {"msg":"OK"}
+    return {"msg":"AUDIO -> MIDI"}
+
+@app.route('/convert/<path:filename>', methods=['GET'])
+def convert(filename):
+    midi_filename = f"{os.path.splitext(filename)[0]}.midi"
+    MIDIConverter(parse_params(infile=os.path.join(app.config['UPLOAD_FOLDER'], filename), output=os.path.join(app.config['DOWNLOAD_FOLDER'], midi_filename), bpm=120))
+    return {"msg":"OK","filename":midi_filename}
 
 @app.route('/download/<path:filename>', methods=['GET'])
 def download(filename):
